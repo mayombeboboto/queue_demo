@@ -1,0 +1,22 @@
+{application, queue_demo,
+ [{description, "An OTP application"},
+  {vsn, "0.1.0"},
+  {registered, []},
+  {mod, {queue_demo_app, []}},
+  {applications,
+   [kernel,
+    stdlib,
+    amqp_client
+   ]},
+  {env,[
+      {username, <<"bob_admin">>},
+      {password, <<"Ieksy78#u1">>},
+      {queue, <<"queue_demo_queue">>},
+      {exchange, <<"queue_demo_exchange">>},
+      {routing_key, <<"queue_demo_routing_key">>}
+  ]},
+  {modules, []},
+
+  {licenses, ["Apache 2.0"]},
+  {links, []}
+ ]}.
