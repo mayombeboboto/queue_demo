@@ -3,6 +3,8 @@
 -behavior(gen_server).
 %%----------------------------------------------------------%%
 -export([start_link/0]).
+-export([get_channel/0]).
+-export([publish_msg/1]).
 
 -export([init/1]).
 -export([handle_call/3]).
@@ -10,8 +12,10 @@
 -export([handle_info/2]).
 -export([terminate/2]).
 %%----------------------------------------------------------%%
--include("include/queue_demo_server.hrl").
+-include("include/queue_demo.hrl").
 -include_lib("amqp_client/include/amqp_client.hrl").
+%%----------------------------------------------------------%%
+-type encoded_json() :: binary().
 %%----------------------------------------------------------%%
 -record(state, { connection :: pid(),
                  channel :: pid() }).
@@ -21,6 +25,14 @@
 -spec start_link() -> {ok, pid()}.
 start_link() ->
     gen_server:start_link({local, ?MODULE}, ?MODULE, [], []).
+
+-spec get_channel() -> pid().
+get_channel() ->
+    gen_server:call(?MODULE, channel).
+
+-spec publish_msg(encoded_json()) -> ok.
+publish_msg(Payload) ->
+    gen_server:cast(?MODULE, {payload, Payload}).
 
 %%----------------------------------------------------------%%
 %%------------------- CALLBACK FUNCTIONS -------------------%%
@@ -37,9 +49,19 @@ init([]) ->
     {ok, #state{ connection=Connection,
                  channel=Channel }}.
 
+handle_call(channel, _From, State=#state{ channel=Channel }) ->
+    {reply, Channel, State};
 handle_call(_Msg, _From, State) ->
     {reply, ok, State}.
 
+handle_cast({payload, Payload}, State=#state{ channel=Channel }) ->
+    Publish = #'basic.publish'{ exchange = ?EXCHANGE,
+                                routing_key = ?ROUTING_KEY },
+    BasicProps = #'P_basic'{ content_type = ?CONTENT_TYPE },
+    Msg = #amqp_msg{ payload = Payload,
+                     props = BasicProps },
+    amqp_channel:cast(Channel, Publish, Msg),
+    {noreply, State};
 handle_cast(_Msg, State) ->
     {noreply, State}.
 

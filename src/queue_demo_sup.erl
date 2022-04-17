@@ -15,10 +15,13 @@ start_link() ->
     supervisor:start_link({local, ?MODULE}, ?MODULE, []).
 
 init([]) ->
-    Strategy = #{ strategy => rest_for_one,
+    SupFlags = #{ strategy => rest_for_one,
                   intensity => 0,
                   period => 3600 },
-    {ok, {Strategy, [set_child_spec(queue_demo_server)]}}.
+    ChildMods = [queue_demo_server, queue_demo_consumer],
+    ChildSpecs = [set_child_spec(Mod) || Mod <- ChildMods],
+
+    {ok, {SupFlags, ChildSpecs}}.
 
 set_child_spec(Mod) ->
     #{ id => Mod,
