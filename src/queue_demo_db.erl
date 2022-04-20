@@ -80,8 +80,5 @@ execute_query(Connection, Queries, QueryName, []) ->
     ok;
 execute_query(Connection, Queries, QueryName, Params) ->
     {ok, Query} = eql:get_query(QueryName, Queries),
-    io:format("Query: ~p~n", [Query]),
-    io:format("Params: ~p~n", [Params]),
-    io:format("Connection: ~p~n", [Connection]),
     epgsql:equery(Connection, binary_to_list(Query), Params),
     ok.
