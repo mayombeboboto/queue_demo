@@ -5,3 +5,11 @@
 -define(ROUTING_KEY, application:get_env(queue_demo, routing_key, <<"queue_demo_routing_key">>)).
 
 -define(CONTENT_TYPE, <<"application/json">>).
+
+-define(DB_QUEUE,            "queue_demo").
+-define(DB_INIT_PATH,        "priv/db/init.sql").
+-define(DB_TRANSACTION_PATH, "priv/db/transaction.sql").
+
+-define(DB_USERNAME,  application:get_env(queue_demo, db_username, <<"postgres">>)).
+-define(DB_PASSWORD,  application:get_env(queue_demo, db_password, <<"admin@123">>)).
+

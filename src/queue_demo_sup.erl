@@ -18,7 +18,7 @@ init([]) ->
     SupFlags = #{ strategy => rest_for_one,
                   intensity => 0,
                   period => 3600 },
-    ChildMods = [queue_demo_server, queue_demo_consumer],
+    ChildMods = [queue_demo_db, queue_demo_server, queue_demo_consumer],
     ChildSpecs = [set_child_spec(Mod) || Mod <- ChildMods],
 
     {ok, {SupFlags, ChildSpecs}}.

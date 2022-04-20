@@ -41,7 +41,8 @@ handle_info(#'basic.consume_ok'{ consumer_tag = Tag }, State) ->
     io:format("Tag: ~p~n", [Tag]),
     {noreply, State#state{ tag=Tag }};
 handle_info({#'basic.deliver'{}, #'amqp_msg'{ payload=Payload }}, State) ->
-    io:format("Payload: ~p~n", [jsx:decode(Payload)]),
+    {ok, Amount} = extract_field_from_payload(<<"amount">>, 0, Payload),
+    queue_demo_db:insert_transaction(Amount),
     {noreply, State};
 handle_info(Msg, State) ->
     io:format("Msg: ~p~n", [Msg]),
@@ -49,3 +50,10 @@ handle_info(Msg, State) ->
 
 terminate(_Reason, #state{ channel=Channel, tag=Tag }) ->
     amqp_channel:call(Channel, #'basic.cancel'{ consumer_tag = Tag }).
+
+%%----------------------------------------------------------%%
+extract_field_from_payload(Field, Default, Payload) ->
+    DecodedPayload = jsx:decode(Payload),
+    Value = maps:get(Field, DecodedPayload, Default),
+    {ok, Value}.
+

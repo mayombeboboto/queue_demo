@@ -9,6 +9,9 @@
     amqp_client
    ]},
   {env,[
+      {db_username, <<"postgres">>},
+      {db_password, <<"admin@123">>},
+
       {username, <<"bob_admin">>},
       {password, <<"Ieksy78#u1">>},
       {queue, <<"queue_demo_queue">>},
