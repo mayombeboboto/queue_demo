@@ -38,7 +38,6 @@ handle_cast(_Msg, State) ->
     {noreply, State}.
 
 handle_info(#'basic.consume_ok'{ consumer_tag = Tag }, State) ->
-    io:format("Tag: ~p~n", [Tag]),
     {noreply, State#state{ tag=Tag }};
 handle_info({#'basic.deliver'{}, #'amqp_msg'{ payload=Payload }}, State) ->
     {ok, Amount} = extract_field_from_payload(<<"amount">>, 0, Payload),
