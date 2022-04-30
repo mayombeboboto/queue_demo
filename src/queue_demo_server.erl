@@ -46,6 +46,8 @@ init([]) ->
     declare_queue(Channel),
     bind_queue(Channel),
 
+    PublishPid = whereis(queue_demo),
+    amqp_channel:register_return_handler(Channel, PublishPid),
     {ok, #state{ connection=Connection,
                  channel=Channel }}.
 
@@ -56,7 +58,8 @@ handle_call(_Msg, _From, State) ->
 
 handle_cast({payload, Payload}, State=#state{ channel=Channel }) ->
     Publish = #'basic.publish'{ exchange = ?EXCHANGE,
-                                routing_key = ?ROUTING_KEY },
+                                routing_key = ?ROUTING_KEY,
+                                mandatory = true },
     BasicProps = #'P_basic'{ content_type = ?CONTENT_TYPE },
     Msg = #amqp_msg{ payload = Payload,
                      props = BasicProps },

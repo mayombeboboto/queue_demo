@@ -1,7 +1,11 @@
 {application, queue_demo,
  [{description, "An OTP application"},
   {vsn, "0.1.0"},
-  {registered, []},
+  {registered, [queue_demo_sup,
+                queue_demo_server,
+                queue_demo_consumer,
+                queue_demo
+            ]},
   {mod, {queue_demo_app, []}},
   {applications,
    [kernel,
