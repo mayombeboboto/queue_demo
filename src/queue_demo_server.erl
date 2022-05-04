@@ -60,7 +60,9 @@ handle_cast({payload, Payload}, State=#state{ channel=Channel }) ->
     Publish = #'basic.publish'{ exchange = ?EXCHANGE,
                                 routing_key = ?ROUTING_KEY,
                                 mandatory = true },
-    BasicProps = #'P_basic'{ content_type = ?CONTENT_TYPE },
+    BasicProps = #'P_basic'{ content_type = ?CONTENT_TYPE,
+                             message_id = generate_id() },
+
     Msg = #amqp_msg{ payload = Payload,
                      props = BasicProps },
     amqp_channel:cast(Channel, Publish, Msg),
@@ -101,3 +103,7 @@ bind_queue(Channel) ->
 set_network_params() ->
     #amqp_params_network{ username = ?USERNAME,
                           password = ?PASSWORD }.
+
+generate_id() ->
+    Bits = entropy_string:bits(5.0e6, 1.0e12),
+    entropy_string:random_string(Bits).
